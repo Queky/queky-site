@@ -1,13 +1,15 @@
 import { useRef, useState, type KeyboardEvent } from "react";
-import { LEVELS } from "../data";
+import { useLang } from "../i18n";
 
 export default function CareerMap() {
-  const [selected, setSelected] = useState(LEVELS.length - 1);
+  const { t } = useLang();
+  const levels = t.map.levels;
+  const [selected, setSelected] = useState(levels.length - 1);
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
-  const level = LEVELS[selected];
+  const level = levels[selected];
 
   const move = (to: number) => {
-    const next = Math.max(0, Math.min(LEVELS.length - 1, to));
+    const next = Math.max(0, Math.min(levels.length - 1, to));
     setSelected(next);
     buttons.current[next]?.focus();
   };
@@ -19,10 +21,10 @@ export default function CareerMap() {
   return (
     <section id="map">
       <div className="wrap">
-        <h2>Career map <span className="tag">select a level</span></h2>
+        <h2>{t.map.title} <span className="tag">{t.map.tag}</span></h2>
         <div className="map pixel-box">
-          <div className="track" role="tablist" aria-label="Career levels">
-            {LEVELS.map((l, i) => (
+          <div className="track" role="tablist" aria-label={t.map.aria}>
+            {levels.map((l, i) => (
               <button
                 key={l.id}
                 ref={el => { buttons.current[i] = el; }}
@@ -43,7 +45,7 @@ export default function CareerMap() {
         </div>
         <article className="quest pixel-box" id="quest" role="tabpanel" aria-live="polite">
           <p className="label" style={{ margin: 0 }}>
-            Level {level.node} · {selected === LEVELS.length - 1 ? "current level" : "cleared"}
+            {t.map.level} {level.node} · {selected === levels.length - 1 ? t.map.current : t.map.cleared}
           </p>
           <h3>{level.title}</h3>
           <div className="meta">{level.meta}</div>
@@ -53,7 +55,7 @@ export default function CareerMap() {
             ))}
           </ul>
         </article>
-        <p className="hint">Tip: use ← → to move between levels.</p>
+        <p className="hint">{t.map.hint}</p>
       </div>
     </section>
   );

@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { INTRO } from "../data";
+import { useLang } from "../i18n";
 
 const PHOTO = "/photo.jpg";
 
 function Avatar() {
+  const { t } = useLang();
   const canvas = useRef<HTMLCanvasElement>(null);
   const [hd, setHd] = useState(false);
 
@@ -24,47 +25,49 @@ function Avatar() {
 
   return (
     <div className="avatar pixel-box">
-      <button onClick={() => setHd(!hd)} aria-label="Switch between pixel and photo portrait">
+      <button onClick={() => setHd(!hd)} aria-label={t.hero.avatarAria}>
         <canvas ref={canvas} width={48} height={64} aria-hidden="true" hidden={hd} />
-        <img src={PHOTO} alt="Portrait of Iñaki Sánchez" hidden={!hd} />
+        <img src={PHOTO} alt={t.hero.photoAlt} hidden={!hd} />
       </button>
-      <span className="label">{hd ? "Click to go back to 8-bit" : "Click to render in HD"}</span>
+      <span className="label">{hd ? t.hero.to8bit : t.hero.toHd}</span>
     </div>
   );
 }
 
 function Dialog() {
+  const { t } = useLang();
   const [page, setPage] = useState(0);
-  const [title, text] = INTRO[page];
+  const [title, text] = t.hero.intro[page];
   return (
     <div className="dialog pixel-box" aria-live="polite">
       <span className="speaker">{title}</span>
       <p>{text}</p>
-      <button className="next" onClick={() => setPage((page + 1) % INTRO.length)} aria-label="Next dialog">
-        NEXT <span>▼</span>
+      <button className="next" onClick={() => setPage((page + 1) % t.hero.intro.length)} aria-label={t.hero.nextAria}>
+        {t.hero.next} <span>▼</span>
       </button>
     </div>
   );
 }
 
 export default function Hero() {
+  const { t } = useLang();
   return (
     <section className="hero">
       <div className="wrap">
         <Avatar />
         <div>
-          <p className="label">Player 1</p>
+          <p className="label">{t.hero.player}</p>
           <h1>Iñaki <span>Sánchez</span></h1>
-          <p className="class-line">Class: Software Engineer · Payments &amp; Growth</p>
+          <p className="class-line">{t.hero.classLine}</p>
           <div className="stats">
-            <div className="stat"><span className="label">Experience</span><b>8+ YRS</b></div>
-            <div className="stat"><span className="label">Main stack</span><b>JAVA·SPRING</b></div>
-            <div className="stat"><span className="label">Base</span><b>BILBAO</b></div>
+            {t.hero.stats.map(([label, value]) => (
+              <div className="stat" key={label}><span className="label">{label}</span><b>{value}</b></div>
+            ))}
           </div>
           <Dialog />
           <div className="hero-cta">
-            <a className="btn" href="#map">Press start</a>
-            <a className="btn ghost" href="#contact">Contact</a>
+            <a className="btn" href="#map">{t.hero.start}</a>
+            <a className="btn ghost" href="#contact">{t.hero.contact}</a>
           </div>
         </div>
       </div>

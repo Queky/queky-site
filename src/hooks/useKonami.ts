@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 
 const CODE = ["arrowup", "arrowup", "arrowdown", "arrowdown", "arrowleft", "arrowright", "arrowleft", "arrowright", "b", "a"];
 
-/** Toggles CRT mode on the Konami code and returns the banner text to show, if any. */
+/** Toggles CRT mode on the Konami code. Returns the new mode while its banner should show, otherwise null. */
 export function useKonami() {
-  const [banner, setBanner] = useState("");
+  const [banner, setBanner] = useState<boolean | null>(null);
 
   useEffect(() => {
     let pos = 0;
@@ -14,10 +14,9 @@ export function useKonami() {
       pos = key === CODE[pos] ? pos + 1 : key === CODE[0] ? 1 : 0;
       if (pos < CODE.length) return;
       pos = 0;
-      const on = document.body.classList.toggle("crt");
-      setBanner(on ? "CHEAT CODE ACCEPTED · CRT MODE ON" : "CRT MODE OFF");
+      setBanner(document.body.classList.toggle("crt"));
       clearTimeout(timer);
-      timer = window.setTimeout(() => setBanner(""), 2200);
+      timer = window.setTimeout(() => setBanner(null), 2200);
     };
     addEventListener("keydown", onKey);
     return () => { removeEventListener("keydown", onKey); clearTimeout(timer); };

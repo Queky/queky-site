@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type PointerEvent } from "react";
+import { useLang } from "../i18n";
 
 const DURATION = 45;
 const LIVES = 3;
@@ -51,15 +52,10 @@ function drawSky(g: CanvasRenderingContext2D, clouds: Cloud[]) {
   g.globalAlpha = 1;
 }
 
-const MESSAGES: Record<Exclude<Phase, "flying">, string> = {
-  idle: "READY FOR TAKE-OFF",
-  landed: "SAFE LANDING",
-  crashed: "BIRD STRIKE!",
-  aborted: "FLIGHT ABORTED",
-};
-const HOW_TO = ["STEER: MOUSE, FINGER OR ↑ ↓", "GRAB COINS · DODGE BIRDS"];
 
 export default function SkyRun() {
+  const { t } = useLang();
+  const txt = t.game;
   const canvas = useRef<HTMLCanvasElement>(null);
   const [phase, setPhase] = useState<Phase>("idle");
   const [score, setScore] = useState(0);
@@ -76,21 +72,21 @@ export default function SkyRun() {
     const draw = () => {
       drawSky(g, world.current.clouds);
       sprite(g, PLANE, W / 2 - 12, 22, color("--ink"));
-      const title = MESSAGES[phase];
+      const title = txt.messages[phase];
       g.font = "8px 'Press Start 2P', monospace"; g.textAlign = "center";
       g.fillStyle = color("--coin");
       g.fillText(title, W / 2, H / 2 + 6);
       g.fillStyle = color("--ink");
       if (phase === "idle") {
         g.font = "6px 'Press Start 2P', monospace";
-        HOW_TO.forEach((line, i) => g.fillText(line, W / 2, H / 2 + 24 + i * 12));
+        txt.howTo.forEach((line, i) => g.fillText(line, W / 2, H / 2 + 24 + i * 12));
       } else {
-        g.fillText(`${score} COINS COLLECTED`, W / 2, H / 2 + 24);
+        g.fillText(txt.collected(score), W / 2, H / 2 + 24);
       }
     };
     draw();
     document.fonts?.ready.then(draw);
-  }, [phase, score]);
+  }, [phase, score, txt]);
 
   // Flight loop
   useEffect(() => {
@@ -183,19 +179,19 @@ export default function SkyRun() {
   return (
     <section id="skyrun">
       <div className="wrap">
-        <h2>Sky run <span className="tag">grab the coins · dodge the birds</span></h2>
+        <h2>{txt.title} <span className="tag">{txt.tag}</span></h2>
         <div className="game pixel-box">
           <div className="game-bar">
-            <span>Coins <b>{score}</b></span>
-            <span>Lives <b aria-label={`${lives} lives`}>{"♥".repeat(lives) || "–"}</b></span>
-            <span>Time <b>{left}</b></span>
-            <span>Best <b>{best}</b></span>
+            <span>{txt.coins} <b>{score}</b></span>
+            <span>{txt.lives} <b aria-label={`${lives}`}>{"♥".repeat(lives) || "–"}</b></span>
+            <span>{txt.time} <b>{left}</b></span>
+            <span>{txt.best} <b>{best}</b></span>
           </div>
           <canvas ref={canvas} id="arena" width={W} height={H} onPointerMove={steer} onPointerDown={steer}
-            aria-label="Sky run mini-game. Steer the plane with the mouse, a finger or the arrow keys to collect coins and avoid birds." />
+            aria-label={txt.aria} />
           <div className="game-controls">
-            <button className="btn" onClick={start}>{flying ? "Restart" : phase === "idle" ? "Take off" : "Fly again"}</button>
-            {flying && <button className="btn stop" onClick={() => setPhase("aborted")}>Stop</button>}
+            <button className="btn" onClick={start}>{flying ? txt.restart : phase === "idle" ? txt.takeOff : txt.again}</button>
+            {flying && <button className="btn stop" onClick={() => setPhase("aborted")}>{txt.stop}</button>}
           </div>
         </div>
       </div>

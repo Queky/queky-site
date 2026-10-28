@@ -7,9 +7,11 @@ import Extras from "./components/Extras";
 import SkyRun from "./components/SkyRun";
 import SavePoint from "./components/SavePoint";
 import { useKonami } from "./hooks/useKonami";
+import { useLang } from "./i18n";
 
 export default function App() {
-  const banner = useKonami();
+  const { t } = useLang();
+  const crt = useKonami();
   return (
     <>
       <SkyBackground />
@@ -23,9 +25,9 @@ export default function App() {
         <SavePoint />
       </main>
       <footer>
-        <div className="wrap">© {new Date().getFullYear()} Iñaki Sánchez · Bilbao · Built pixel by pixel · ↑↑↓↓←→←→BA</div>
+        <div className="wrap">© {new Date().getFullYear()} Iñaki Sánchez · {t.footer} · ↑↑↓↓←→←→BA</div>
       </footer>
-      {banner && <div className="banner pixel-box">{banner}</div>}
+      {crt !== null && <div className="banner pixel-box">{crt ? t.konami.on : t.konami.off}</div>}
     </>
   );
 }
