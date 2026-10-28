@@ -1,9 +1,10 @@
 import Hud from "./components/Hud";
+import SkyBackground from "./components/SkyBackground";
 import Hero from "./components/Hero";
 import CareerMap from "./components/CareerMap";
 import Inventory from "./components/Inventory";
 import Extras from "./components/Extras";
-import BugHunt from "./components/BugHunt";
+import SkyRun from "./components/SkyRun";
 import SavePoint from "./components/SavePoint";
 import { useKonami } from "./hooks/useKonami";
 
@@ -11,13 +12,14 @@ export default function App() {
   const banner = useKonami();
   return (
     <>
+      <SkyBackground />
       <Hud />
       <main id="top">
         <Hero />
         <CareerMap />
         <Inventory />
         <Extras />
-        <BugHunt />
+        <SkyRun />
         <SavePoint />
       </main>
       <footer>

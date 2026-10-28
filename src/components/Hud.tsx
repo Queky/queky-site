@@ -2,7 +2,7 @@ const LINKS = [
   ["#map", "Career"],
   ["#inventory", "Skills"],
   ["#extras", "Extras"],
-  ["#bughunt", "Bug hunt"],
+  ["#skyrun", "Sky run"],
   ["#contact", "Contact"],
 ];
 

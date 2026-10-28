@@ -1,6 +1,6 @@
 # queky-site
 
-Personal CV website for Iñaki Sánchez, served at [queky.es](https://www.queky.es). It's a React single-page site in a retro pixel-art style, with a career map, a skills inventory and a small bug-hunt mini-game.
+Personal CV website for Iñaki Sánchez, served at [queky.es](https://www.queky.es). It's a React single-page site in a retro pixel-art style, with a career map, a skills inventory and a small plane mini-game (Sky run).
 
 ## Stack
 
