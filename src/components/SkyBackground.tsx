@@ -65,12 +65,12 @@ export default function SkyBackground() {
       const drift = (scrollY / SCALE) * 0.08;
       const ink = color("--ink");
       stars.forEach(s => {
-        const glow = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(s.phase + t * s.speed));
+        const glow = 0.2 + 0.45 * (0.5 + 0.5 * Math.sin(s.phase + t * s.speed));
         g.globalAlpha = glow;
         g.fillStyle = ink;
         const y = ((s.y - drift) % h + h) % h;
         g.fillRect(Math.round(s.x), Math.round(y), 1, 1);
-        if (s.big && glow > 0.8) {
+        if (s.big && glow > 0.55) {
           g.globalAlpha = glow * 0.5;
           g.fillRect(Math.round(s.x) - 1, Math.round(y), 3, 1);
           g.fillRect(Math.round(s.x), Math.round(y) - 1, 1, 3);
@@ -81,7 +81,7 @@ export default function SkyBackground() {
       clouds.forEach(cl => {
         cl.x -= cl.speed * dt;
         if (cl.x + cl.w < 0) { cl.x = w + Math.random() * 40; cl.y = h * (0.25 + Math.random() * 0.65); }
-        g.globalAlpha = 0.35;
+        g.globalAlpha = 0.22;
         g.fillRect(Math.round(cl.x), Math.round(cl.y), Math.round(cl.w), 3);
         g.fillRect(Math.round(cl.x + cl.w * 0.2), Math.round(cl.y - 2), Math.round(cl.w * 0.5), 2);
       });
@@ -106,7 +106,7 @@ export default function SkyBackground() {
         p.trail = p.trail.filter(d => (d.ttl -= dt) > 0);
         g.fillStyle = dim;
         p.trail.forEach(d => { g.globalAlpha = d.ttl / 2.5 * 0.35; g.fillRect(Math.round(d.x), Math.round(d.y), z, z); });
-        g.globalAlpha = z === 2 ? 0.95 : 0.7;
+        g.globalAlpha = z === 2 ? 0.8 : 0.5;
         const map = p.vx > 0 ? PLANE_RIGHT : PLANE_LEFT;
         map.forEach((row, j) => [...row].forEach((ch, k) => { if (ch === "1") g.fillRect(Math.round(p.x + k * z), Math.round(p.y + j * z), z, z); }));
         if (Math.floor(p.age * 2) % 2 === 0) {

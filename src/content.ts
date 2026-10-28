@@ -41,7 +41,7 @@ export interface Content {
     takeOff: string; again: string; restart: string; stop: string; aria: string;
     messages: Record<GamePhase, string>; howTo: string[]; collected: (n: number) => string;
   };
-  contact: { title: string; pitch: string; email: string; copy: string; write: string; cv: string; download: string; copied: string; fallback: string };
+  contact: { title: string; pitch: string; email: string; copy: string; write: string; cv: string; download: string; cvFile: string; copied: string; fallback: string };
   footer: string;
   konami: { on: string; off: string };
 }
@@ -176,7 +176,7 @@ const es: Content = {
   contact: {
     title: "Punto de guardado",
     pitch: "¿Buscas un ingeniero backend o full-stack con experiencia en pagos? Hablemos.",
-    email: "Email", copy: "Copiar", write: "Escríbeme", cv: "CV", download: "Descargar PDF",
+    email: "Email", copy: "Copiar", write: "Escríbeme", cv: "CV", download: "Descargar PDF", cvFile: "/inaki-sanchez-cv-es.pdf",
     copied: "Email copiado. ¡Partida guardada!", fallback: "Pulsa Ctrl/Cmd + C para copiar.",
   },
   footer: "Bilbao · Hecho píxel a píxel",
@@ -313,7 +313,7 @@ const en: Content = {
   contact: {
     title: "Save point",
     pitch: "Looking for a backend or full-stack engineer who knows payments? I'd be happy to talk.",
-    email: "Email", copy: "Copy", write: "Write me", cv: "CV", download: "Download PDF",
+    email: "Email", copy: "Copy", write: "Write me", cv: "CV", download: "Download PDF", cvFile: "/inaki-sanchez-cv-en.pdf",
     copied: "Email copied. Game saved!", fallback: "Press Ctrl/Cmd + C to copy.",
   },
   footer: "Bilbao · Built pixel by pixel",
