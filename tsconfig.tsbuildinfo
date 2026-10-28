@@ -1,1 +1,0 @@
-{"root":["./src/App.tsx","./src/data.ts","./src/main.tsx","./src/components/BugHunt.tsx","./src/components/CareerMap.tsx","./src/components/Extras.tsx","./src/components/Hero.tsx","./src/components/Hud.tsx","./src/components/Inventory.tsx","./src/components/SavePoint.tsx","./src/hooks/useKonami.ts","./vite.config.ts"],"version":"5.6.3"}
