@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Iñaki Sánchez · queky</title>
+<meta name="description" content="Iñaki Sánchez, software engineer in Bilbao. Payments, invoicing and growth systems with Java, Spring Boot and React.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one column "game cartridge" — HUD bar, player card, level map, inventory, mini-game, save point. Single dark arcade world by choice. */
+:root {
+  --night: #12132b;      /* page */
+  --panel: #1d1f45;      /* boxes */
+  --panel-2: #272a5c;    /* raised */
+  --ink: #eef0ff;        /* text */
+  --dim: #9da3d6;        /* secondary text */
+  --coin: #ffcc33;       /* primary accent */
+  --mint: #45e0b8;       /* positive / links */
+  --berry: #ff5d8f;      /* danger / bugs */
+  --edge: #0a0b1c;       /* pixel outlines */
+  --f-display: "Press Start 2P", "Courier New", monospace;
+  --f-label: "VT323", "Courier New", monospace;
+  --f-body: "IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+  --px: 4px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation: none !important; transition: none !important; } }
+body {
+  margin: 0; background: var(--night); color: var(--ink);
+  font: 15px/1.65 var(--f-body);
+  background-image: radial-gradient(var(--panel) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+a { color: var(--mint); }
+:focus-visible { outline: 3px solid var(--coin); outline-offset: 3px; }
+.wrap {
+  max-width: 1040px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.pixel-box {
+  background: var(--panel);
+  box-shadow:
+    0 calc(-1 * var(--px)) 0 var(--edge), 0 var(--px) 0 var(--edge),
+    calc(-1 * var(--px)) 0 0 var(--edge), var(--px) 0 0 var(--edge),
+    inset 0 var(--px) 0 var(--panel-2);
+  margin: var(--px);
+}
+h1, h2, h3 { font-family: var(--f-display); font-weight: 400; text-wrap: balance; line-height: 1.4; margin: 0; }
+h2 { font-size: clamp(15px, 2.4vw, 20px); color: var(--coin); display: flex; gap: 12px; align-items: center; }
+h2 .tag { font-family: var(--f-label); font-size: 22px; color: var(--dim); letter-spacing: 1px; }
+.label { font-family: var(--f-label); font-size: 20px; letter-spacing: 1px; color: var(--dim); text-transform: uppercase; }
+section { padding-block: 56px 8px; }
+section > .wrap { display: grid; gap: 24px; }
+.btn {
+  font: 11px/1 var(--f-display); color: var(--edge); background: var(--coin);
+  border: 0; padding: 14px 18px; cursor: pointer; text-decoration: none; display: inline-block;
+  box-shadow: inset calc(-1 * var(--px)) calc(-1 * var(--px)) 0 #c99a10, 0 0 0 var(--px) var(--edge);
+}
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(1px); box-shadow: inset var(--px) var(--px) 0 #c99a10, 0 0 0 var(--px) var(--edge); }
+.btn.ghost { background: var(--panel-2); color: var(--ink); box-shadow: inset calc(-1 * var(--px)) calc(-1 * var(--px)) 0 var(--edge), 0 0 0 var(--px) var(--edge); }
+
+/* HUD */
+.hud { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--edge); border-bottom: var(--px) solid var(--panel-2); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 21; background: var(--edge); }
+.hud .wrap { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-block: 10px; flex-wrap: wrap; }
+.logo { font: 12px var(--f-display); color: var(--coin); text-decoration: none; }
+.hud nav { display: flex; gap: 4px 18px; flex-wrap: wrap; }
+.hud nav a { font: 20px/1 var(--f-label); color: var(--ink); text-decoration: none; letter-spacing: 1px; }
+.hud nav a:hover, .hud nav a:focus-visible { color: var(--coin); }
+.hud nav a::before { content: "▸"; color: transparent; margin-right: 4px; }
+.hud nav a:hover::before { color: var(--coin); }
+
+/* Hero */
+.hero { padding-block: 48px 8px; }
+.hero .wrap { display: grid; grid-template-columns: auto 1fr; gap: 36px; align-items: start; }
+.avatar { padding: 14px; display: grid; gap: 10px; justify-items: center; }
+.avatar button { all: unset; cursor: pointer; display: block; }
+.avatar canvas, .avatar img { width: 192px; height: 256px; image-rendering: pixelated; display: block; background: var(--panel-2); }
+.avatar .label { font-size: 17px; }
+.hero h1 { font-size: clamp(22px, 4.6vw, 40px); color: var(--ink); }
+.hero h1 span { color: var(--coin); }
+.class-line { font: 22px/1.2 var(--f-label); color: var(--mint); margin: 14px 0 22px; letter-spacing: 1px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px 28px; margin-bottom: 22px; }
+.stat { display: grid; }
+.stat b { font: 13px var(--f-display); color: var(--coin); font-weight: 400; }
+.dialog { padding: 18px 20px 14px; position: relative; min-height: 150px; }
+.dialog p { margin: 0 0 8px; max-width: 64ch; }
+.dialog .speaker { font: 10px var(--f-display); color: var(--coin); display: block; margin-bottom: 10px; }
+.dialog .next { font: 18px var(--f-label); color: var(--dim); background: none; border: 0; cursor: pointer; float: right; padding: 0; }
+.dialog .next span { color: var(--coin); display: inline-block; animation: bob 0.9s steps(2) infinite; }
+@keyframes bob { 50% { transform: translateY(3px); } }
+.hero-cta { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 22px; }
+
+/* Level map */
+.map { padding: 26px 20px 20px; overflow-x: auto; }
+.track { display: grid; grid-template-columns: repeat(5, minmax(120px, 1fr)); position: relative; min-width: 640px; }
+.track::before { content: ""; position: absolute; left: 10%; right: 10%; top: 27px; height: var(--px); background: repeating-linear-gradient(90deg, var(--dim) 0 8px, transparent 8px 16px); }
+.level { all: unset; cursor: pointer; display: grid; justify-items: center; gap: 8px; text-align: center; position: relative; padding: 0 6px; }
+.level .node { width: 58px; height: 58px; display: grid; place-items: center; font: 12px var(--f-display); background: var(--panel-2); color: var(--ink);
+  box-shadow: 0 0 0 var(--px) var(--edge), inset -4px -4px 0 var(--edge); transition: transform .15s steps(2); }
+.level .when { font: 18px/1 var(--f-label); color: var(--dim); }
+.level .where { font: 15px/1.2 var(--f-label); color: var(--ink); letter-spacing: .5px; max-width: 16ch; }
+.level:hover .node { transform: translateY(-4px); }
+.level[aria-selected="true"] .node { background: var(--coin); color: var(--edge); }
+.level[aria-selected="true"] .node::after { content: "▼"; position: absolute; top: -26px; color: var(--coin); font-size: 14px; animation: bob .9s steps(2) infinite; }
+.quest { padding: 22px 24px; display: grid; gap: 10px; }
+.quest h3 { font-size: 14px; color: var(--ink); }
+.quest .meta { font: 20px/1.2 var(--f-label); color: var(--mint); letter-spacing: .5px; }
+.quest ul { margin: 6px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; max-width: 78ch; }
+.quest li { padding-left: 26px; position: relative; }
+.quest li::before { content: ""; position: absolute; left: 4px; top: .55em; width: 8px; height: 8px; background: var(--coin); box-shadow: 2px 2px 0 var(--edge); }
+.quest li b { color: var(--coin); font-weight: 600; }
+.hint { font: 18px var(--f-label); color: var(--dim); margin: 0; }
+
+/* Inventory */
+.tabs { display: flex; gap: 10px; flex-wrap: wrap; }
+.tab { font: 18px/1 var(--f-label); letter-spacing: 1px; text-transform: uppercase; color: var(--ink); background: var(--panel); border: 0; padding: 10px 14px; cursor: pointer; box-shadow: 0 0 0 3px var(--edge); }
+.tab[aria-selected="true"] { background: var(--mint); color: var(--edge); }
+.inv { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 300px); gap: 20px; align-items: start; }
+.slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 12px; padding: 16px; }
+.slot { all: unset; cursor: pointer; background: var(--panel-2); min-height: 74px; display: grid; place-items: center; text-align: center; padding: 10px 6px;
+  font: 18px/1.1 var(--f-label); letter-spacing: .5px; color: var(--ink); box-shadow: inset -4px -4px 0 var(--edge), 0 0 0 3px var(--edge); }
+.slot:hover, .slot[aria-pressed="true"] { background: var(--coin); color: var(--edge); }
+.slot .ico { display: block; font: 12px var(--f-display); margin-bottom: 6px; opacity: .8; }
+.item-card { padding: 18px; display: grid; gap: 8px; min-height: 180px; }
+.item-card h3 { font-size: 12px; color: var(--coin); }
+.item-card p { margin: 0; color: var(--ink); }
+.item-card .rarity { font: 18px var(--f-label); color: var(--mint); }
+
+/* Languages + side quests */
+.two { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+.card { padding: 20px; display: grid; gap: 12px; align-content: start; }
+.card h3 { font-size: 12px; color: var(--coin); }
+.bar { display: grid; grid-template-columns: 90px 1fr auto; gap: 12px; align-items: center; font: 20px var(--f-label); }
+.bar .cells { display: flex; gap: 3px; }
+.bar .cells i { width: 14px; height: 14px; background: var(--panel-2); box-shadow: 0 0 0 2px var(--edge); }
+.bar .cells i.on { background: var(--mint); }
+.repo { display: grid; gap: 2px; }
+.repo a { font: 20px var(--f-label); letter-spacing: .5px; }
+.repo span { color: var(--dim); font-size: 14px; }
+
+/* Mini game */
+.game { padding: 16px; display: grid; gap: 12px; }
+.game-bar { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font: 22px var(--f-label); }
+.game-bar b { color: var(--coin); font-weight: 400; }
+#arena { width: 100%; max-width: 100%; aspect-ratio: 16 / 7; background: var(--edge); image-rendering: pixelated; cursor: crosshair; display: block; touch-action: manipulation; }
+
+/* Save point */
+.save { padding: 26px; display: grid; gap: 16px; }
+.save .row { display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; font: 22px var(--f-label); }
+.save code { font: 16px var(--f-body); color: var(--coin); user-select: all; }
+.toast { font: 18px var(--f-label); color: var(--mint); min-height: 1em; }
+footer { padding-block: 48px; text-align: center; font: 18px var(--f-label); color: var(--dim); }
+
+/* CRT easter egg */
+body.crt::after { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 50;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,.28) 0 1px, transparent 1px 3px); mix-blend-mode: multiply; animation: flicker 4s infinite; }
+@keyframes flicker { 0%, 100% { opacity: .9; } 50% { opacity: 1; } }
+.banner { position: fixed; left: 50%; top: 40%; transform: translate(-50%, -50%); z-index: 60; padding: 22px 26px; text-align: center; font: 12px/1.8 var(--f-display); color: var(--coin); max-width: calc(100% - 32px); }
+
+@media (max-width: 760px) {
+  .hero .wrap { grid-template-columns: 1fr; }
+  .avatar { justify-self: center; }
+  .inv { grid-template-columns: 1fr; }
+  .hud nav { display: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="hud">
+  <div class="wrap">
+    <a class="logo" href="#top">QUEKY.ES</a>
+    <nav aria-label="Sections">
+      <a href="#map">Career</a>
+      <a href="#inventory">Skills</a>
+      <a href="#extras">Extras</a>
+      <a href="#bughunt">Bug hunt</a>
+      <a href="#contact">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <div class="avatar pixel-box">
+        <button id="avatar-btn" aria-label="Switch between pixel and photo portrait">
+          <canvas id="avatar" width="48" height="64" aria-hidden="true"></canvas>
+          <img id="avatar-hd" alt="Portrait of Iñaki Sánchez" hidden>
+        </button>
+        <span class="label" id="avatar-hint">Click to render in HD</span>
+      </div>
+
+      <div>
+        <p class="label">Player 1</p>
+        <h1>Iñaki <span>Sánchez</span></h1>
+        <p class="class-line">Class: Software Engineer · Payments &amp; Growth</p>
+        <div class="stats">
+          <div class="stat"><span class="label">Experience</span><b>8+ YRS</b></div>
+          <div class="stat"><span class="label">Main stack</span><b>JAVA·SPRING</b></div>
+          <div class="stat"><span class="label">Base</span><b>BILBAO</b></div>
+        </div>
+
+        <div class="dialog pixel-box" aria-live="polite">
+          <span class="speaker" id="dlg-title">INTRO 1/3</span>
+          <p id="dlg-text">I'm a software engineer with 8+ years of experience. For the last 7 I've built payments, invoicing and fraud-prevention systems for Lookiero &amp; Outfittery, a subscription fashion company that operates across Europe.</p>
+          <button class="next" id="dlg-next" aria-label="Next dialog">NEXT <span>▼</span></button>
+        </div>
+
+        <div class="hero-cta">
+          <a class="btn" href="#map">Press start</a>
+          <a class="btn ghost" href="#contact">Contact</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="map">
+    <div class="wrap">
+      <h2>Career map <span class="tag">select a level</span></h2>
+      <div class="map pixel-box">
+        <div class="track" role="tablist" aria-label="Career levels" id="track"></div>
+      </div>
+      <article class="quest pixel-box" id="quest" role="tabpanel" aria-live="polite"></article>
+      <p class="hint">Tip: use ← → to move between levels.</p>
+    </div>
+  </section>
+
+  <section id="inventory">
+    <div class="wrap">
+      <h2>Inventory <span class="tag">inspect an item</span></h2>
+      <div class="tabs" role="tablist" aria-label="Skill categories" id="inv-tabs"></div>
+      <div class="inv">
+        <div class="slots pixel-box" id="slots"></div>
+        <aside class="item-card pixel-box" id="item-card" aria-live="polite"></aside>
+      </div>
+    </div>
+  </section>
+
+  <section id="extras">
+    <div class="wrap">
+      <h2>Extras</h2>
+      <div class="two">
+        <div class="card pixel-box">
+          <h3>Languages</h3>
+          <div class="bar"><span>Spanish</span><span class="cells" data-n="5"></span><span>Native</span></div>
+          <div class="bar"><span>Basque</span><span class="cells" data-n="5"></span><span>Native</span></div>
+          <div class="bar"><span>English</span><span class="cells" data-n="4"></span><span>C1</span></div>
+        </div>
+        <div class="card pixel-box">
+          <h3>Education</h3>
+          <p style="margin:0">BSc in Computer Management &amp; Information Systems Engineering<br><span class="label" style="font-size:18px">UPV/EHU · 2012 – 2018</span></p>
+          <p style="margin:0; color: var(--dim); font-size: 14px">Developing on AWS and AWS Technical Essentials (2019) · Smart Cities Week, UCLL &amp; KU Leuven (2018) · CERN Spring Campus (2014)</p>
+        </div>
+        <div class="card pixel-box">
+          <h3>Side quests</h3>
+          <div class="repo"><a href="https://github.com/queky/android-package-uninstaller" target="_blank" rel="noopener">android-package-uninstaller</a><span>Python tool to remove Android packages over ADB.</span></div>
+          <div class="repo"><a href="https://github.com/queky/PythonAI" target="_blank" rel="noopener">PythonAI</a><span>Computer-vision experiments with OpenCV.</span></div>
+          <div class="repo"><a href="https://github.com/queky" target="_blank" rel="noopener">More on GitHub</a><span>Telegram bots, Advent of Code, Android tinkering.</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="bughunt">
+    <div class="wrap">
+      <h2>Bug hunt <span class="tag">30 seconds · squash as many as you can</span></h2>
+      <div class="game pixel-box">
+        <div class="game-bar">
+          <span>Score <b id="score">0</b></span>
+          <span>Time <b id="time">30</b></span>
+          <span>Best <b id="best">0</b></span>
+        </div>
+        <canvas id="arena" width="320" height="140" aria-label="Bug hunt mini-game. Click or tap bugs to squash them."></canvas>
+        <div><button class="btn" id="play">Start game</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="wrap">
+      <h2>Save point</h2>
+      <div class="save pixel-box">
+        <p style="margin:0; max-width: 60ch">Looking for a backend or full-stack engineer who knows payments? I'd be happy to talk.</p>
+        <div class="row">
+          <span>Email</span><code id="email">inaki19san@gmail.com</code>
+          <button class="btn ghost" id="copy">Copy</button>
+          <a class="btn" href="mailto:inaki19san@gmail.com">Write me</a>
+        </div>
+        <div class="row">
+          <span>GitHub</span><a href="https://github.com/queky" target="_blank" rel="noopener">github.com/queky</a>
+          <span>CV</span><a href="inaki-sanchez-cv.pdf">Download PDF</a>
+        </div>
+        <div class="toast" id="toast" role="status"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">© 2026 Iñaki Sánchez · Bilbao · Built pixel by pixel · ↑↑↓↓←→←→BA</div>
+</footer>
+
+<script>
+const PHOTO = "photo.jpg";
+
+/* ---------- Avatar: posterized pixel portrait, click for HD ---------- */
+(() => {
+  const c = document.getElementById("avatar"), ctx = c.getContext("2d");
+  const hd = document.getElementById("avatar-hd"), hint = document.getElementById("avatar-hint");
+  const img = new Image();
+  img.onload = () => {
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(img, 0, 0, c.width, c.height);
+    const d = ctx.getImageData(0, 0, c.width, c.height);
+    for (let i = 0; i < d.data.length; i += 4) for (let k = 0; k < 3; k++) d.data[i + k] = Math.round(d.data[i + k] / 51) * 51;
+    ctx.putImageData(d, 0, 0);
+  };
+  img.src = PHOTO; hd.src = PHOTO;
+  document.getElementById("avatar-btn").addEventListener("click", () => {
+    const pixel = hd.hidden;
+    hd.hidden = !pixel; c.hidden = pixel;
+    hint.textContent = pixel ? "Click to go back to 8-bit" : "Click to render in HD";
+  });
+})();
+
+/* ---------- Dialog ---------- */
+(() => {
+  const pages = [
+    ["INTRO 1/3", "I'm a software engineer with 8+ years of experience. For the last 7 I've built payments, invoicing and fraud-prevention systems for Lookiero & Outfittery, a subscription fashion company that operates across Europe."],
+    ["INTRO 2/3", "I'm backend-focused (Java, Spring Boot, event-driven microservices) and comfortable on the frontend with React and React Native. I like modernising legacy systems, integrating payment providers and helping a business launch in new markets."],
+    ["INTRO 3/3", "I use AI coding assistants every day to design, build and review software. Before all this I programmed a PlayStation 4 game, which is why this page looks the way it does."],
+  ];
+  let i = 0;
+  const t = document.getElementById("dlg-title"), p = document.getElementById("dlg-text");
+  document.getElementById("dlg-next").addEventListener("click", () => {
+    i = (i + 1) % pages.length; t.textContent = pages[i][0]; p.textContent = pages[i][1];
+  });
+})();
+
+/* ---------- Career map ---------- */
+const LEVELS = [
+  { id: "moon", node: "1", when: "2016", where: "Moon Factory Studios",
+    title: "Game Programmer", meta: "Moon Factory Studios · Madrid · Mar 2016 – Nov 2016",
+    items: ["Programmed <b>Rolling BOB</b> for PlayStation 4, an award winner at PlayStation Talents.",
+            "Built enemies, gameplay mechanics and character controls in Unreal Engine 4 and C++."] },
+  { id: "comala", node: "2", when: "2018", where: "Comalatech",
+    title: "Software Engineer", meta: "Comalatech · Bilbao · Jun 2018 – Oct 2019",
+    items: ["Developed Atlassian Marketplace apps for Confluence and Jira, for Server / Data Center (Java) and Cloud (JavaScript, React).",
+            "Delivered new features, performance improvements and bug fixes, and supported customers with configuration issues."] },
+  { id: "xd", node: "3", when: "2019", where: "Lookiero · XD Squad",
+    title: "Software Engineer · XD Squad", meta: "Lookiero & Outfittery Group · Bilbao · Oct 2019 – Dec 2019",
+    items: ["Backend work on the middleware connecting the legacy platform with the payment and anti-fraud services (Groovy, Vert.x)."] },
+  { id: "pay", node: "4", when: "2020", where: "Lookiero · Payments Squad",
+    title: "Software Engineer · Payments Squad", meta: "Lookiero & Outfittery Group · Bilbao · Jan 2020 – Dec 2022",
+    items: ["<b>Helped split the legacy payments and anti-fraud systems</b> into Java/Spring microservices, including a payments service independent of any single provider.",
+            "<b>Built a customer balance (wallet) service</b> and migrated the platform to use it.",
+            "<b>Built an internal fraud-management tool</b> for the Customer Service team, and migrated historical data into the new services.",
+            "<b>Developed payment screens for web, iOS and Android</b> (React, React Native), including Strong Customer Authentication and PayPal.",
+            "<b>Published payment data to Databricks</b> through domain events for analytics and reporting."] },
+  { id: "gf", node: "5", when: "2023 – now", where: "Lookiero · Growth & Finance",
+    title: "Software Engineer · Growth & Finance Squad", meta: "Lookiero & Outfittery Group · Bilbao · Jan 2023 – Present",
+    items: ["<b>Expanded the payment platform</b> with new payment methods (Klarna, iDeal) and more reliable payment-status updates from Stripe.",
+            "<b>Made payments and invoicing multi-currency,</b> allowing the business to launch in new markets.",
+            "<b>One of the main developers of the invoicing service,</b> which generates customer invoices automatically from orders and purchases.",
+            "<b>Improved the fraud-prevention service</b> to make its alerts more accurate and reduce false positives.",
+            "<b>Built a shared authentication and authorisation library</b> reused across the squad's microservices.",
+            "<b>Gradually moved business logic out of the legacy monolith</b> into event-driven microservices.",
+            "<b>Streamed payment and order data into Databricks</b> through domain events for analytics and reporting.",
+            "<b>Helped bring AI-assisted development into the squad,</b> with shared guidelines so coding agents follow our architecture and testing standards."] },
+];
+(() => {
+  const track = document.getElementById("track"), quest = document.getElementById("quest");
+  const btns = LEVELS.map((l, idx) => {
+    const b = document.createElement("button");
+    b.className = "level"; b.setAttribute("role", "tab"); b.id = "lvl-" + l.id;
+    b.setAttribute("aria-controls", "quest");
+    b.innerHTML = `<span class="node">${l.node}</span><span class="when">${l.when}</span><span class="where">${l.where}</span>`;
+    b.addEventListener("click", () => select(idx));
+    b.addEventListener("keydown", e => {
+      if (e.key === "ArrowRight") { select(Math.min(idx + 1, LEVELS.length - 1)); btns[Math.min(idx + 1, LEVELS.length - 1)].focus(); }
+      if (e.key === "ArrowLeft") { select(Math.max(idx - 1, 0)); btns[Math.max(idx - 1, 0)].focus(); }
+    });
+    track.appendChild(b); return b;
+  });
+  function select(idx) {
+    btns.forEach((b, j) => { b.setAttribute("aria-selected", j === idx); b.tabIndex = j === idx ? 0 : -1; });
+    const l = LEVELS[idx];
+    quest.innerHTML = `<p class="label" style="margin:0">Level ${l.node} · ${idx === LEVELS.length - 1 ? "current level" : "cleared"}</p>
+      <h3>${l.title}</h3><div class="meta">${l.meta}</div><ul>${l.items.map(i => `<li>${i}</li>`).join("")}</ul>`;
+  }
+  select(LEVELS.length - 1);
+})();
+
+/* ---------- Inventory ---------- */
+const INV = {
+  "Backend": [
+    ["JV", "Java", "Main weapon. From Java 8 to 25, across microservices and a large monolith."],
+    ["SB", "Spring Boot", "Spring Boot and Spring Cloud for most of the services I've built since 2020."],
+    ["VX", "Vert.x · Groovy", "The legacy platform's stack. I know it well enough to take it apart safely."],
+    ["ND", "Node.js", "Express services in TypeScript, such as an exchange-rates API."],
+    ["PY", "Python", "Scripts, tooling and side projects."],
+  ],
+  "Architecture": [
+    ["HX", "Hexagonal / DDD", "Domain code kept free of frameworks, with clear boundaries between contexts."],
+    ["EV", "Event-driven", "Services talking through RabbitMQ and Kafka events instead of tight calls."],
+    ["CQ", "CQRS", "Separate read and write paths where the domain needs it."],
+    ["MG", "Legacy migration", "Moving logic out of a monolith step by step without stopping the business."],
+  ],
+  "Payments": [
+    ["ST", "Stripe", "Cards, payment methods, webhooks and Strong Customer Authentication."],
+    ["KL", "Klarna · iDeal", "Local and buy-now-pay-later payment methods for European markets."],
+    ["PP", "PayPal", "Integrated on web and mobile apps."],
+    ["FX", "Multi-currency", "Prices, payments and invoices in several currencies for new markets."],
+    ["FR", "Fraud prevention", "More accurate fraud alerts, plus internal tooling for the Customer Service team."],
+    ["IN", "Invoicing", "Automatic invoice generation driven by orders and purchases."],
+  ],
+  "Data": [
+    ["MQ", "RabbitMQ · Kafka", "Messaging backbone between services."],
+    ["DB", "Databricks", "Feeding payment and order data to the data platform through domain events."],
+    ["PG", "PostgreSQL · MySQL", "Relational databases, one per service, with Liquibase migrations."],
+    ["AW", "AWS", "SQS and S3, plus the AWS developer courses."],
+  ],
+  "Frontend": [
+    ["RE", "React", "Web apps and internal tools."],
+    ["RN", "React Native", "Payment screens shared across web, iOS and Android with Expo."],
+    ["TS", "TypeScript", "Helped migrate the payments UI library to TypeScript."],
+    ["NG", "Angular", "An internal fraud-management tool."],
+  ],
+  "Quality": [
+    ["JU", "JUnit · Mockito", "Unit and integration tests as a habit."],
+    ["TC", "Testcontainers", "End-to-end tests against real databases and brokers."],
+    ["MU", "Mutation testing", "Pitest to check that tests actually catch bugs."],
+    ["CI", "CI/CD", "GitHub Actions, Jenkins, Docker and SonarCloud."],
+  ],
+  "AI": [
+    ["CC", "Claude Code", "Daily driver for designing, building, testing and reviewing code."],
+    ["AG", "Coding agents", "Shared project guidelines and reusable skills so agents follow the team's standards."],
+  ],
+};
+(() => {
+  const tabs = document.getElementById("inv-tabs"), slots = document.getElementById("slots"), card = document.getElementById("item-card");
+  const names = Object.keys(INV);
+  const tabBtns = names.map((n, i) => {
+    const b = document.createElement("button"); b.className = "tab"; b.textContent = n; b.setAttribute("role", "tab"); b.id = "tab-" + i;
+    b.addEventListener("click", () => openTab(i)); tabs.appendChild(b); return b;
+  });
+  function show(item, cat) {
+    card.innerHTML = `<span class="label">${cat}</span><h3>${item[1]}</h3><p>${item[2]}</p><span class="rarity">★ Equipped</span>`;
+  }
+  function openTab(i) {
+    tabBtns.forEach((b, j) => b.setAttribute("aria-selected", i === j));
+    slots.innerHTML = "";
+    INV[names[i]].forEach((item, k) => {
+      const s = document.createElement("button"); s.className = "slot"; s.id = `slot-${i}-${k}`;
+      s.innerHTML = `<span><span class="ico">${item[0]}</span>${item[1]}</span>`;
+      const pick = () => { slots.querySelectorAll(".slot").forEach(x => x.setAttribute("aria-pressed", x === s)); show(item, names[i]); };
+      s.addEventListener("click", pick); s.addEventListener("mouseenter", pick); s.addEventListener("focus", pick);
+      slots.appendChild(s);
+    });
+    slots.firstChild.setAttribute("aria-pressed", true); show(INV[names[i]][0], names[i]);
+  }
+  openTab(0);
+  document.querySelectorAll(".cells").forEach(el => { for (let i = 0; i < 5; i++) { const c = document.createElement("i"); if (i < +el.dataset.n) c.className = "on"; el.appendChild(c); } });
+})();
+
+/* ---------- Bug hunt ---------- */
+(() => {
+  const cv = document.getElementById("arena"), g = cv.getContext("2d");
+  const scoreEl = document.getElementById("score"), timeEl = document.getElementById("time"), bestEl = document.getElementById("best"), play = document.getElementById("play");
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const BUG = ["..1..1..", "...11...", ".111111.", "1.1111.1", ".111111.", "1.1111.1", ".111111.", "1..11..1"];
+  const SPLAT = ["1..1...1", ".1.1.1..", "..111...", "11111.11", "..111...", ".1.1.1..", "1...1..1", "........"];
+  let bugs = [], splats = [], score = 0, left = 30, running = false, last = 0, spawn = 0, timer;
+  let best = 0; try { best = +localStorage.getItem("queky-best") || 0; } catch (e) {}
+  bestEl.textContent = best;
+  const sprite = (m, x, y, color, s = 2) => { g.fillStyle = color; m.forEach((row, j) => [...row].forEach((ch, i) => { if (ch === "1") g.fillRect(Math.round(x + i * s), Math.round(y + j * s), s, s); })); };
+  function idle() {
+    g.fillStyle = css("--edge"); g.fillRect(0, 0, cv.width, cv.height);
+    g.fillStyle = css("--coin"); g.font = "8px 'Press Start 2P', monospace"; g.textAlign = "center";
+    g.fillText(left === 0 ? `GAME OVER · ${score} BUGS SQUASHED` : "PRESS START GAME", cv.width / 2, cv.height / 2 - 6);
+    g.fillStyle = css("--dim"); g.fillText(left === 0 ? "SHIP IT!" : "CLICK THE BUGS BEFORE THEY ESCAPE", cv.width / 2, cv.height / 2 + 14);
+    sprite(BUG, cv.width / 2 - 8, 20, css("--berry"));
+  }
+  function frame(t) {
+    if (!running) return;
+    const dt = Math.min((t - last) / 1000, 0.05); last = t;
+    spawn -= dt;
+    if (spawn <= 0) { const y = 10 + Math.random() * (cv.height - 30); bugs.push({ x: -16, y, vx: 30 + Math.random() * 40 + (30 - left) * 2, vy: (Math.random() - .5) * 30, ph: 0 }); spawn = Math.max(.25, .8 - (30 - left) * .015); }
+    g.fillStyle = css("--edge"); g.fillRect(0, 0, cv.width, cv.height);
+    g.fillStyle = css("--panel"); for (let x = 0; x < cv.width; x += 16) for (let y = 0; y < cv.height; y += 16) g.fillRect(x, y, 1, 1);
+    splats = splats.filter(s => (s.t -= dt) > 0); splats.forEach(s => sprite(SPLAT, s.x, s.y, css("--coin")));
+    bugs.forEach(b => { b.x += b.vx * dt; b.y += b.vy * dt; if (b.y < 4 || b.y > cv.height - 20) b.vy *= -1; b.ph += dt * 10; sprite(BUG, b.x, b.y + (Math.floor(b.ph) % 2), css("--berry")); });
+    bugs = bugs.filter(b => b.x < cv.width + 4);
+    requestAnimationFrame(frame);
+  }
+  function hit(ev) {
+    if (!running) return;
+    const r = cv.getBoundingClientRect(), x = (ev.clientX - r.left) * cv.width / r.width, y = (ev.clientY - r.top) * cv.height / r.height;
+    const i = bugs.findIndex(b => x > b.x - 4 && x < b.x + 20 && y > b.y - 4 && y < b.y + 20);
+    if (i >= 0) { const b = bugs.splice(i, 1)[0]; splats.push({ x: b.x, y: b.y, t: .6 }); score++; scoreEl.textContent = score; }
+  }
+  cv.addEventListener("pointerdown", hit);
+  play.addEventListener("click", () => {
+    bugs = []; splats = []; score = 0; left = 30; scoreEl.textContent = 0; timeEl.textContent = 30; running = true; spawn = 0;
+    play.textContent = "Restart"; clearInterval(timer);
+    timer = setInterval(() => {
+      left--; timeEl.textContent = left;
+      if (left <= 0) {
+        clearInterval(timer); running = false;
+        if (score > best) { best = score; bestEl.textContent = best; try { localStorage.setItem("queky-best", best); } catch (e) {} }
+        idle(); play.textContent = "Play again";
+      }
+    }, 1000);
+    last = performance.now(); requestAnimationFrame(frame);
+  });
+  document.fonts && document.fonts.ready.then(idle); idle();
+})();
+
+/* ---------- Copy email ---------- */
+document.getElementById("copy").addEventListener("click", () => {
+  const toast = document.getElementById("toast"), text = document.getElementById("email").textContent;
+  navigator.clipboard.writeText(text).then(() => { toast.textContent = "Email copied. Game saved!"; })
+    .catch(() => { const r = document.createRange(); r.selectNodeContents(document.getElementById("email")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast.textContent = "Press Ctrl/Cmd + C to copy."; });
+});
+
+/* ---------- Konami code → CRT mode ---------- */
+(() => {
+  const code = ["ArrowUp","ArrowUp","ArrowDown","ArrowDown","ArrowLeft","ArrowRight","ArrowLeft","ArrowRight","b","a"];
+  let pos = 0;
+  addEventListener("keydown", e => {
+    pos = (e.key.toLowerCase() === code[pos].toLowerCase()) ? pos + 1 : (e.key === code[0] ? 1 : 0);
+    if (pos === code.length) {
+      pos = 0; document.body.classList.toggle("crt");
+      const b = document.createElement("div"); b.className = "banner pixel-box";
+      b.textContent = document.body.classList.contains("crt") ? "CHEAT CODE ACCEPTED · CRT MODE ON" : "CRT MODE OFF";
+      document.body.appendChild(b); setTimeout(() => b.remove(), 2200);
+    }
+  });
+})();
+</script>
+</body>
+</html>
