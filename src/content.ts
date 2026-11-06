@@ -23,14 +23,18 @@ export type Item = [icon: string, name: string, description: string];
 
 export type GamePhase = "idle" | "landed" | "crashed" | "aborted";
 
+/** A challenge told as a boss fight: what made it hard, how I approached it, what came out of it. */
+export interface Boss { id: string; name: string; when: string; challenge: string; strategy: string; result: string }
+
 export interface Content {
-  nav: { career: string; skills: string; extras: string; game: string; contact: string; languages: string };
+  nav: { career: string; bosses: string; skills: string; extras: string; game: string; contact: string; languages: string };
   hero: {
     player: string; classLine: string; stats: [label: string, value: string][];
     intro: [title: string, text: string][]; next: string; nextAria: string;
     start: string; contact: string; toHd: string; to8bit: string; avatarAria: string; photoAlt: string;
   };
   map: { title: string; tag: string; hint: string; level: string; current: string; cleared: string; aria: string; levels: Level[] };
+  bosses: { title: string; tag: string; challenge: string; strategy: string; result: string; defeated: string; list: Boss[] };
   inventory: { title: string; tag: string; equipped: string; aria: string; categories: [name: string, items: Item[]][] };
   extras: {
     title: string; languagesTitle: string; languages: [name: string, level: number, label: string][];
@@ -47,7 +51,7 @@ export interface Content {
 }
 
 const es: Content = {
-  nav: { career: "Carrera", skills: "Habilidades", extras: "Extras", game: "Sky run", contact: "Contacto", languages: "Idioma" },
+  nav: { career: "Carrera", bosses: "Retos", skills: "Habilidades", extras: "Extras", game: "Sky run", contact: "Contacto", languages: "Idioma" },
   hero: {
     player: "Jugador 1",
     classLine: "Clase: Ingeniero de software · Pagos y Growth",
@@ -94,6 +98,24 @@ const es: Content = {
                 ["Saqué lógica de negocio del monolito legacy de forma gradual", " hacia microservicios orientados a eventos."],
                 ["Envié datos de pagos y pedidos a Databricks", " mediante eventos de dominio para analítica y reporting."],
                 ["Ayudé a introducir el desarrollo asistido por IA en el squad,", " con guías compartidas para que los agentes de código sigan nuestros estándares de arquitectura y testing."]] },
+    ],
+  },
+  bosses: {
+    title: "Jefes finales", tag: "retos y cómo los resolví",
+    challenge: "Reto", strategy: "Estrategia", result: "Resultado", defeated: "DERROTADO",
+    list: [
+      { id: "balance", name: "Sacar el saldo de los clientes del monolito", when: "2023 – 2024",
+        challenge: "El saldo de los clientes (dinero real que se usa en el checkout, promociones, referidos y devoluciones) vivía dentro del monolito legacy. Había que moverlo a un nuevo servicio de pagos sin downtime y sin descuadres.",
+        strategy: "Seguí el patrón strangler fig. Creé un proxy de saldo en el monolito y pasé por él todas las llamadas: checkout, promociones, referidos y devoluciones. Un feature flag decidía si el proxy usaba el código legacy o el nuevo servicio, así que podíamos cambiar de forma gradual y volver atrás al instante. Cada operación de añadir o usar saldo registraba sus errores.",
+        result: "La plataforma pasó al nuevo servicio sin downtime. Cuando funcionó de forma estable, eliminé los flags, el proxy y el código legacy." },
+      { id: "migrators", name: "Migrar los datos de pago a los nuevos servicios", when: "2019 – 2020",
+        challenge: "Tarjetas, clientes, cajas y datos de fraude tenían que pasar de la base de datos legacy a los nuevos servicios de pagos y fraude mientras los clientes seguían comprando.",
+        strategy: "Escribí migradores que copiaban los datos por lotes paginados, con ficheros de rollback para deshacer una ejecución si algo fallaba. Después, los nuevos servicios se mantenían sincronizados mediante eventos.",
+        result: "Los nuevos servicios arrancaron con todo el histórico, sin parar la operativa." },
+      { id: "markets", name: "Abrir nuevos mercados sin riesgos", when: "2019 – hoy",
+        challenge: "Abrir nuevos países como Suecia y Suiza exigía nuevas divisas en pagos y facturación sin poner en riesgo los mercados que ya funcionaban.",
+        strategy: "Construí el soporte multidivisa mientras cada país seguía oculto tras un feature flag. Así el código llegaba pronto a producción y el lanzamiento era un cambio de configuración.",
+        result: "Los mercados se lanzaron sin afectar a los existentes y después eliminé los flags." },
     ],
   },
   inventory: {
@@ -184,7 +206,7 @@ const es: Content = {
 };
 
 const en: Content = {
-  nav: { career: "Career", skills: "Skills", extras: "Extras", game: "Sky run", contact: "Contact", languages: "Language" },
+  nav: { career: "Career", bosses: "Challenges", skills: "Skills", extras: "Extras", game: "Sky run", contact: "Contact", languages: "Language" },
   hero: {
     player: "Player 1",
     classLine: "Class: Software Engineer · Payments & Growth",
@@ -231,6 +253,24 @@ const en: Content = {
                 ["Gradually moved business logic out of the legacy monolith", " into event-driven microservices."],
                 ["Streamed payment and order data into Databricks", " through domain events for analytics and reporting."],
                 ["Helped bring AI-assisted development into the squad,", " with shared guidelines so coding agents follow our architecture and testing standards."]] },
+    ],
+  },
+  bosses: {
+    title: "Boss fights", tag: "challenges and how I solved them",
+    challenge: "Challenge", strategy: "Strategy", result: "Result", defeated: "DEFEATED",
+    list: [
+      { id: "balance", name: "Moving customer balances out of the monolith", when: "2023 – 2024",
+        challenge: "Customer balance (real money used in checkout, promotions, referral rewards and refunds) lived inside the legacy monolith. It had to move to a new payments service with no downtime and no balance mismatches.",
+        strategy: "I followed the strangler fig pattern. I added a balance proxy to the monolith and routed every caller through it: checkout, promotions, referral rewards and refunds. A feature flag decided whether the proxy used the legacy code or the new service, so we could switch over gradually and switch back instantly. Every add or use of balance logged its errors.",
+        result: "The platform moved to the new service with no downtime. Once it ran reliably, I removed the flags, the proxy and the legacy code." },
+      { id: "migrators", name: "Migrating payment data to the new services", when: "2019 – 2020",
+        challenge: "Cards, customers, boxes and fraud data had to move from the legacy database into new payments and fraud services while customers kept buying.",
+        strategy: "I wrote migrators that copied the data in paginated batches, with rollback files to undo a run if anything went wrong. After that, events kept the new services in sync.",
+        result: "The new services started with the full history, without stopping the business." },
+      { id: "markets", name: "Launching new markets safely", when: "2019 – now",
+        challenge: "Opening new countries such as Sweden and Switzerland needed new currencies in payments and invoicing, without putting the existing markets at risk.",
+        strategy: "I built multi-currency support while each country stayed behind a feature flag. The code reached production early and the launch itself was a configuration change.",
+        result: "The markets launched without affecting the existing ones, and I removed the flags afterwards." },
     ],
   },
   inventory: {

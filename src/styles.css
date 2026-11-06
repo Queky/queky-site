@@ -116,6 +116,21 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .quest li b { color: var(--coin); font-weight: 600; }
 .hint { font: 21px var(--f-label); color: var(--dim); margin: 0; }
 
+/* Boss fights */
+.boss { padding: 22px 24px; display: grid; gap: 18px; }
+.boss-head { display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; }
+.boss h3 { font-size: 15px; color: var(--ink); margin-top: 6px; }
+.hp { all: unset; cursor: pointer; display: grid; justify-items: end; gap: 6px; }
+.hp-bar { width: 160px; height: 14px; background: var(--edge); box-shadow: 0 0 0 3px var(--panel-2); display: block; }
+.hp-bar i { display: block; height: 100%; width: 0; background: var(--berry); }
+.hp-bar i.drain { animation: drain 1.4s steps(10) both; }
+@keyframes drain { from { width: 100%; } to { width: 0; } }
+.stamp { font: 11px var(--f-display); color: var(--coin); letter-spacing: 1px; }
+.boss-body { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.boss-body p { margin: 4px 0 0; }
+.boss-body > div:last-child p { color: var(--coin); font-weight: 600; }
+@media (max-width: 860px) { .boss-body { grid-template-columns: 1fr; } }
+
 /* Inventory */
 .tabs { display: flex; gap: 10px; flex-wrap: wrap; }
 .tab { font: 21px/1 var(--f-label); letter-spacing: 1px; text-transform: uppercase; color: var(--ink); background: var(--panel); border: 0; padding: 10px 14px; cursor: pointer; box-shadow: 0 0 0 3px var(--edge); }

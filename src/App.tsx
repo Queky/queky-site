@@ -2,6 +2,7 @@ import Hud from "./components/Hud";
 import SkyBackground from "./components/SkyBackground";
 import Hero from "./components/Hero";
 import CareerMap from "./components/CareerMap";
+import Bosses from "./components/Bosses";
 import Inventory from "./components/Inventory";
 import Extras from "./components/Extras";
 import SkyRun from "./components/SkyRun";
@@ -19,6 +20,7 @@ export default function App() {
       <main id="top">
         <Hero />
         <CareerMap />
+        <Bosses />
         <Inventory />
         <Extras />
         <SkyRun />

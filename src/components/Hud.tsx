@@ -5,6 +5,7 @@ export default function Hud() {
   const { lang, setLang, t } = useLang();
   const links = [
     ["#map", t.nav.career],
+    ["#bosses", t.nav.bosses],
     ["#inventory", t.nav.skills],
     ["#extras", t.nav.extras],
     ["#skyrun", t.nav.game],
