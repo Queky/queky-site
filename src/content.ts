@@ -2,7 +2,7 @@ export type Lang = "es" | "en";
 export const LANGS: Lang[] = ["es", "en"];
 export const DEFAULT_LANG: Lang = "es";
 
-export const EMAIL = "inaki19san@gmail.com";
+export const EMAIL = "hello@queky.es";
 export const GITHUB = "https://github.com/queky";
 
 /** A quest line: optional bold lead, then the rest of the sentence. */
