@@ -30,7 +30,6 @@ export default function SavePoint() {
           </div>
           <div className="row">
             <span>GitHub</span><a href={GITHUB} target="_blank" rel="noopener">github.com/queky</a>
-            <span>{c.cv}</span><a href={c.cvFile}>{c.download}</a>
           </div>
           <div className="toast" role="status">{toast && c[toast]}</div>
         </div>
