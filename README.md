@@ -13,7 +13,6 @@ Personal CV website for Iñaki Sánchez, served at [queky.es](https://www.queky.
 ```
 src/             React app (components, data, hooks, styles)
 public/          static files copied as-is (photo.jpg)
-cv/              Word sources of the CV (es, en)
 nginx/           nginx config for the web container
 Dockerfile       multi-stage: node builds the app, nginx serves dist/
 Caddyfile        HTTPS reverse proxy, redirects www to the apex domain

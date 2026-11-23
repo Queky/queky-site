@@ -17,7 +17,6 @@ Personal CV website for Iñaki Sánchez, served at https://queky.es. It is a sin
 - `src/hooks/useKonami.ts`: Konami-code easter egg (CRT mode).
 - `src/styles.css`: global styles. Colors and fonts are CSS tokens in `:root`.
 - `public/`: static files served as-is (`photo.jpg`).
-- `cv/`: Word sources of the CV. They are not served by the site.
 - `Dockerfile`: multi-stage build, node builds and nginx serves `dist/`.
 - `nginx/default.conf`: web server config, with caching and the `/healthz` endpoint.
 - `Caddyfile` and `docker-compose.yml`: Caddy reverse proxy with automatic HTTPS in front of nginx.
