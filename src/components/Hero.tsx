@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useLang } from "../i18n";
 
-const PHOTO = "/photo.jpg";
+const PHOTO = `${import.meta.env.BASE_URL}photo.jpg`;
 
 function Avatar() {
   const { t } = useLang();
