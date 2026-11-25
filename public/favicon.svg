@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
+  <rect width="16" height="16" fill="#050e1f"/>
+  <rect x="1" y="1" width="14" height="14" fill="#0a1a33"/>
+  <rect x="1" y="1" width="14" height="1" fill="#183a6b"/>
+  <!-- 8-bit plane matching Sky run sprite -->
+  <path fill="#ffcc33" d="M6 4h2v1h1v1h1v1h3v1h1v1H2V6h1v1h3V4zm0 5h4v1H9v1H8v1H6V9zm-4 0h1v1H2V9z"/>
+  <rect x="10" y="7" width="2" height="1" fill="#eaf3ff"/>
+</svg>

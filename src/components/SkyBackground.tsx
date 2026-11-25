@@ -15,8 +15,6 @@ interface Cloud { x: number; y: number; w: number; speed: number }
 interface Plane { x: number; y: number; vx: number; size: number; age: number; trail: { x: number; y: number; ttl: number }[] }
 interface Meteor { x: number; y: number; ttl: number }
 
-const color = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-
 export default function SkyBackground() {
   const canvas = useRef<HTMLCanvasElement>(null);
 
@@ -54,20 +52,30 @@ export default function SkyBackground() {
       });
     };
 
+    const style = getComputedStyle(document.documentElement);
+    const palette = {
+      edge: style.getPropertyValue("--edge").trim(),
+      night: style.getPropertyValue("--night").trim(),
+      ink: style.getPropertyValue("--ink").trim(),
+      panel2: style.getPropertyValue("--panel-2").trim(),
+      dim: style.getPropertyValue("--dim").trim(),
+      berry: style.getPropertyValue("--berry").trim(),
+      coin: style.getPropertyValue("--coin").trim(),
+    };
+
     const draw = (dt: number, t: number) => {
       const { width: w, height: h } = c;
       const grad = g.createLinearGradient(0, 0, 0, h);
-      grad.addColorStop(0, color("--edge"));
-      grad.addColorStop(1, color("--night"));
+      grad.addColorStop(0, palette.edge);
+      grad.addColorStop(1, palette.night);
       g.fillStyle = grad;
       g.fillRect(0, 0, w, h);
 
       const drift = (scrollY / SCALE) * 0.08;
-      const ink = color("--ink");
       stars.forEach(s => {
         const glow = 0.2 + 0.45 * (0.5 + 0.5 * Math.sin(s.phase + t * s.speed));
         g.globalAlpha = glow;
-        g.fillStyle = ink;
+        g.fillStyle = palette.ink;
         const y = ((s.y - drift) % h + h) % h;
         g.fillRect(Math.round(s.x), Math.round(y), 1, 1);
         if (s.big && glow > 0.55) {
@@ -77,7 +85,7 @@ export default function SkyBackground() {
         }
       });
 
-      g.fillStyle = color("--panel-2");
+      g.fillStyle = palette.panel2;
       clouds.forEach(cl => {
         cl.x -= cl.speed * dt;
         if (cl.x + cl.w < 0) { cl.x = w + Math.random() * 40; cl.y = h * (0.25 + Math.random() * 0.65); }
@@ -88,7 +96,7 @@ export default function SkyBackground() {
 
       if (meteor) {
         meteor.x += 90 * dt; meteor.y += 45 * dt; meteor.ttl -= dt;
-        g.fillStyle = ink;
+        g.fillStyle = palette.ink;
         for (let i = 0; i < 6; i++) {
           g.globalAlpha = Math.max(0, meteor.ttl) * (1 - i / 6);
           g.fillRect(Math.round(meteor.x - i * 2), Math.round(meteor.y - i), 1, 1);
@@ -96,7 +104,6 @@ export default function SkyBackground() {
         if (meteor.ttl <= 0) meteor = null;
       }
 
-      const dim = color("--dim"), red = color("--berry"), gold = color("--coin");
       for (let i = planes.length - 1; i >= 0; i--) {
         const p = planes[i];
         p.x += p.vx * dt; p.age += dt;
@@ -104,15 +111,15 @@ export default function SkyBackground() {
         const tail = p.vx > 0 ? p.x : p.x + 9 * z;
         if (Math.random() < 0.6) p.trail.push({ x: tail, y: p.y + 2 * z, ttl: 2.5 });
         p.trail = p.trail.filter(d => (d.ttl -= dt) > 0);
-        g.fillStyle = dim;
+        g.fillStyle = palette.dim;
         p.trail.forEach(d => { g.globalAlpha = d.ttl / 2.5 * 0.35; g.fillRect(Math.round(d.x), Math.round(d.y), z, z); });
         g.globalAlpha = z === 2 ? 0.8 : 0.5;
         const map = p.vx > 0 ? PLANE_RIGHT : PLANE_LEFT;
         map.forEach((row, j) => [...row].forEach((ch, k) => { if (ch === "1") g.fillRect(Math.round(p.x + k * z), Math.round(p.y + j * z), z, z); }));
         if (Math.floor(p.age * 2) % 2 === 0) {
           g.globalAlpha = 1;
-          g.fillStyle = red; g.fillRect(Math.round(p.x + 4 * z), Math.round(p.y), z, z);
-          g.fillStyle = gold; g.fillRect(Math.round(p.x + 4 * z), Math.round(p.y + 4 * z), z, z);
+          g.fillStyle = palette.berry; g.fillRect(Math.round(p.x + 4 * z), Math.round(p.y), z, z);
+          g.fillStyle = palette.coin; g.fillRect(Math.round(p.x + 4 * z), Math.round(p.y + 4 * z), z, z);
         }
         if (p.x < -40 || p.x > w + 40) planes.splice(i, 1);
       }

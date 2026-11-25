@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { EMAIL, GITHUB } from "../content";
+import { EMAIL, GITHUB, LINKEDIN, TWITTER } from "../content";
 import { useLang } from "../i18n";
 
 export default function SavePoint() {
@@ -29,7 +29,13 @@ export default function SavePoint() {
             <a className="btn" href={`mailto:${EMAIL}`}>{c.write}</a>
           </div>
           <div className="row">
-            <span>GitHub</span><a href={GITHUB} target="_blank" rel="noopener">github.com/queky</a>
+            <span>GitHub</span><a href={GITHUB} target="_blank" rel="noopener noreferrer">github.com/queky</a>
+          </div>
+          <div className="row">
+            <span>LinkedIn</span><a href={LINKEDIN} target="_blank" rel="noopener noreferrer">linkedin.com/in/isanchez92</a>
+          </div>
+          <div className="row">
+            <span>X / Twitter</span><a href={TWITTER} target="_blank" rel="noopener noreferrer">@Qu3ky</a>
           </div>
           <div className="toast" role="status">{toast && c[toast]}</div>
         </div>

@@ -4,6 +4,8 @@ export const DEFAULT_LANG: Lang = "en";
 
 export const EMAIL = "hello@queky.es";
 export const GITHUB = "https://github.com/queky";
+export const LINKEDIN = "https://www.linkedin.com/in/isanchez92/";
+export const TWITTER = "https://x.com/Qu3ky";
 
 /** A quest line: optional bold lead, then the rest of the sentence. */
 export type QuestLine = [lead: string, rest: string];
@@ -27,14 +29,14 @@ export type GamePhase = "idle" | "landed" | "crashed" | "aborted";
 export interface Boss { id: string; name: string; when: string; challenge: string; strategy: string; result: string }
 
 export interface Content {
-  nav: { career: string; bosses: string; skills: string; extras: string; game: string; contact: string; languages: string };
+  nav: { career: string; bosses: string; skills: string; extras: string; game: string; contact: string; languages: string; sections: string };
   hero: {
     player: string; classLine: string; stats: [label: string, value: string][];
     intro: [title: string, text: string][]; next: string; nextAria: string;
     start: string; contact: string; toHd: string; to8bit: string; avatarAria: string; photoAlt: string;
   };
   map: { title: string; tag: string; hint: string; level: string; current: string; cleared: string; aria: string; levels: Level[] };
-  bosses: { title: string; tag: string; challenge: string; strategy: string; result: string; defeated: string; list: Boss[] };
+  bosses: { title: string; tag: string; bossLabel: string; challenge: string; strategy: string; result: string; defeated: string; list: Boss[] };
   inventory: { title: string; tag: string; equipped: string; aria: string; categories: [name: string, items: Item[]][] };
   extras: {
     title: string; languagesTitle: string; languages: [name: string, level: number, label: string][];
@@ -51,7 +53,7 @@ export interface Content {
 }
 
 const es: Content = {
-  nav: { career: "Carrera", bosses: "Retos", skills: "Habilidades", extras: "Extras", game: "Sky run", contact: "Contacto", languages: "Idioma" },
+  nav: { career: "Carrera", bosses: "Retos", skills: "Habilidades", extras: "Extras", game: "Sky run", contact: "Contacto", languages: "Idioma", sections: "Secciones" },
   hero: {
     player: "Jugador 1",
     classLine: "Clase: Ingeniero de software · Pagos y Growth",
@@ -101,7 +103,7 @@ const es: Content = {
     ],
   },
   bosses: {
-    title: "Jefes finales", tag: "retos y cómo los resolví",
+    title: "Jefes finales", tag: "retos y cómo los resolví", bossLabel: "Jefe",
     challenge: "Reto", strategy: "Estrategia", result: "Resultado", defeated: "DERROTADO",
     list: [
       { id: "balance", name: "Sacar el saldo de los clientes del monolito", when: "2023 – 2024",
@@ -206,7 +208,7 @@ const es: Content = {
 };
 
 const en: Content = {
-  nav: { career: "Career", bosses: "Challenges", skills: "Skills", extras: "Extras", game: "Sky run", contact: "Contact", languages: "Language" },
+  nav: { career: "Career", bosses: "Challenges", skills: "Skills", extras: "Extras", game: "Sky run", contact: "Contact", languages: "Language", sections: "Sections" },
   hero: {
     player: "Player 1",
     classLine: "Class: Software Engineer · Payments & Growth",
@@ -256,7 +258,7 @@ const en: Content = {
     ],
   },
   bosses: {
-    title: "Boss fights", tag: "challenges and how I solved them",
+    title: "Boss fights", tag: "challenges and how I solved them", bossLabel: "Boss",
     challenge: "Challenge", strategy: "Strategy", result: "Result", defeated: "DEFEATED",
     list: [
       { id: "balance", name: "Moving customer balances out of the monolith", when: "2023 – 2024",

@@ -24,7 +24,19 @@ type Phase = "idle" | "flying" | "landed" | "crashed" | "aborted";
 interface Thing { kind: "bird" | "coin"; x: number; y: number; vx: number; wobble: number }
 interface Cloud { x: number; y: number; w: number; speed: number }
 
-const color = (name: string) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+interface Palette { air: string; airLow: string; cloud: string; ink: string; coin: string; edge: string }
+
+function readPalette(): Palette {
+  const s = getComputedStyle(document.documentElement);
+  return {
+    air: s.getPropertyValue("--air").trim(),
+    airLow: s.getPropertyValue("--air-low").trim(),
+    cloud: s.getPropertyValue("--cloud").trim(),
+    ink: s.getPropertyValue("--ink").trim(),
+    coin: s.getPropertyValue("--coin").trim(),
+    edge: s.getPropertyValue("--edge").trim(),
+  };
+}
 
 function sprite(g: CanvasRenderingContext2D, map: string[], x: number, y: number, fill: string, size = 2) {
   g.fillStyle = fill;
@@ -41,12 +53,12 @@ function newClouds(): Cloud[] {
   return Array.from({ length: 5 }, (_, i) => ({ x: i * 70 + Math.random() * 40, y: 8 + Math.random() * (H - 40), w: 18 + Math.random() * 26, speed: 8 + Math.random() * 10 }));
 }
 
-function drawSky(g: CanvasRenderingContext2D, clouds: Cloud[]) {
+function drawSky(g: CanvasRenderingContext2D, clouds: Cloud[], p: Palette) {
   const grad = g.createLinearGradient(0, 0, 0, H);
-  grad.addColorStop(0, color("--air"));
-  grad.addColorStop(1, color("--air-low"));
+  grad.addColorStop(0, p.air);
+  grad.addColorStop(1, p.airLow);
   g.fillStyle = grad; g.fillRect(0, 0, W, H);
-  g.fillStyle = color("--cloud");
+  g.fillStyle = p.cloud;
   g.globalAlpha = 0.35;
   clouds.forEach(c => { g.fillRect(Math.round(c.x), Math.round(c.y), Math.round(c.w), 6); g.fillRect(Math.round(c.x + 6), Math.round(c.y - 4), Math.round(c.w - 12), 4); });
   g.globalAlpha = 1;
@@ -69,14 +81,15 @@ export default function SkyRun() {
     if (phase === "flying") return;
     const g = canvas.current?.getContext("2d");
     if (!g) return;
+    const p = readPalette();
     const draw = () => {
-      drawSky(g, world.current.clouds);
-      sprite(g, PLANE, W / 2 - 12, 22, color("--ink"));
+      drawSky(g, world.current.clouds, p);
+      sprite(g, PLANE, W / 2 - 12, 22, p.ink);
       const title = txt.messages[phase];
       g.font = "8px 'Press Start 2P', monospace"; g.textAlign = "center";
-      g.fillStyle = color("--coin");
+      g.fillStyle = p.coin;
       g.fillText(title, W / 2, H / 2 + 6);
-      g.fillStyle = color("--ink");
+      g.fillStyle = p.ink;
       if (phase === "idle") {
         g.font = "6px 'Press Start 2P', monospace";
         txt.howTo.forEach((line, i) => g.fillText(line, W / 2, H / 2 + 24 + i * 12));
@@ -93,7 +106,9 @@ export default function SkyRun() {
     if (phase !== "flying") return;
     const g = canvas.current?.getContext("2d");
     if (!g) return;
+    const p = readPalette();
     let last = performance.now();
+    let shownLeft = DURATION;
     let raf = 0;
 
     const keys = (e: KeyboardEvent) => {
@@ -103,11 +118,21 @@ export default function SkyRun() {
     };
     addEventListener("keydown", keys);
 
-    const frame = (t: number) => {
+    const frame = (now: number) => {
       const w = world.current;
-      const dt = Math.min((t - last) / 1000, 0.05);
-      last = t;
+      const dt = Math.min((now - last) / 1000, 0.05);
+      last = now;
       w.elapsed += dt;
+      const remaining = Math.max(0, Math.ceil(DURATION - w.elapsed));
+      if (remaining !== shownLeft) {
+        shownLeft = remaining;
+        setLeft(remaining);
+      }
+      if (w.elapsed >= DURATION) {
+        setPhase("landed");
+        return;
+      }
+
       w.hurt = Math.max(0, w.hurt - dt);
       w.y += (w.target - w.y) * Math.min(1, dt * 8);
 
@@ -119,7 +144,7 @@ export default function SkyRun() {
       }
 
       w.clouds.forEach(c => { c.x -= c.speed * dt; if (c.x + c.w < 0) { c.x = W + Math.random() * 40; c.y = 8 + Math.random() * (H - 40); } });
-      drawSky(g, w.clouds);
+      drawSky(g, w.clouds, p);
 
       const px = 24, py = w.y - 8;
       w.things = w.things.filter(o => {
@@ -133,34 +158,29 @@ export default function SkyRun() {
           if (w.lives <= 0) setPhase("crashed");
           return false;
         }
-        if (o.kind === "coin") sprite(g, COIN, o.x, oy, color("--coin"));
-        else sprite(g, Math.floor(o.wobble) % 2 ? BIRD_UP : BIRD_DOWN, o.x, oy, color("--edge"));
+        if (o.kind === "coin") sprite(g, COIN, o.x, oy, p.coin);
+        else sprite(g, Math.floor(o.wobble) % 2 ? BIRD_UP : BIRD_DOWN, o.x, oy, p.edge);
         return o.x > -20;
       });
 
       const blink = w.hurt > 0 && Math.floor(w.hurt * 10) % 2 === 0;
-      if (!blink) sprite(g, PLANE, px, py, color("--ink"));
+      if (!blink) sprite(g, PLANE, px, py, p.ink);
       raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);
 
-    const clock = window.setInterval(() => setLeft(l => l - 1), 1000);
-    return () => { cancelAnimationFrame(raf); clearInterval(clock); removeEventListener("keydown", keys); };
+    return () => { cancelAnimationFrame(raf); removeEventListener("keydown", keys); };
   }, [phase]);
-
-  // Out of time
-  useEffect(() => {
-    if (phase === "flying" && left <= 0) setPhase("landed");
-  }, [left, phase]);
 
   // Record best score when a flight ends
   useEffect(() => {
     if (phase === "flying" || phase === "idle") return;
     const final = world.current.score;
-    if (final > best) {
-      setBest(final);
+    setBest(prev => {
+      if (final <= prev) return prev;
       try { localStorage.setItem(BEST_KEY, String(final)); } catch { /* storage unavailable */ }
-    }
+      return final;
+    });
   }, [phase]);
 
   const start = () => {

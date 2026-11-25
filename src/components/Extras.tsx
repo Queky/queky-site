@@ -31,7 +31,7 @@ export default function Extras() {
             <h3>{x.sideTitle}</h3>
             {x.repos.map(([name, url, text]) => (
               <div className="repo" key={url}>
-                <a href={url} target="_blank" rel="noopener">{name}</a>
+                <a href={url} target="_blank" rel="noopener noreferrer">{name}</a>
                 <span>{text}</span>
               </div>
             ))}

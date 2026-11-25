@@ -15,7 +15,7 @@ export default function Hud() {
     <header className="hud">
       <div className="wrap">
         <a className="logo" href="#top">QUEKY.ES</a>
-        <nav aria-label="Sections">
+        <nav aria-label={t.nav.sections}>
           {links.map(([href, label]) => <a key={href} href={href}>{label}</a>)}
         </nav>
         <div className="lang-switch" role="group" aria-label={t.nav.languages}>

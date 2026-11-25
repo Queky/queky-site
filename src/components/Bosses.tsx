@@ -14,7 +14,7 @@ export default function Bosses() {
           <article className="boss pixel-box" key={boss.id}>
             <header className="boss-head">
               <div>
-                <p className="label" style={{ margin: 0 }}>Boss {i + 1} · {boss.when}</p>
+                <p className="label" style={{ margin: 0 }}>{b.bossLabel} {i + 1} · {boss.when}</p>
                 <h3>{boss.name}</h3>
               </div>
               <button

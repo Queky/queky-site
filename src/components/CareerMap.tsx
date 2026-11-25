@@ -1,12 +1,20 @@
-import { useRef, useState, type KeyboardEvent } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { useLang } from "../i18n";
 
 export default function CareerMap() {
   const { t } = useLang();
   const levels = t.map.levels;
   const [selected, setSelected] = useState(levels.length - 1);
+  const mapRef = useRef<HTMLDivElement>(null);
   const buttons = useRef<(HTMLButtonElement | null)[]>([]);
   const level = levels[selected];
+
+  useEffect(() => {
+    const map = mapRef.current;
+    const btn = buttons.current[selected];
+    if (!map || !btn) return;
+    map.scrollLeft = btn.offsetLeft - (map.clientWidth - btn.clientWidth) / 2;
+  }, [selected]);
 
   const move = (to: number) => {
     const next = Math.max(0, Math.min(levels.length - 1, to));
@@ -22,7 +30,7 @@ export default function CareerMap() {
     <section id="map">
       <div className="wrap">
         <h2>{t.map.title} <span className="tag">{t.map.tag}</span></h2>
-        <div className="map pixel-box">
+        <div className="map pixel-box" ref={mapRef}>
           <div className="track" role="tablist" aria-label={t.map.aria}>
             {levels.map((l, i) => (
               <button
