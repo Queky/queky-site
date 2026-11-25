@@ -11,8 +11,8 @@ Personal CV website for Iñaki Sánchez, served at https://queky.es. It is a sin
 
 ## Layout
 
-- `src/content.ts`: all text on the site, in Spanish (`es`, the default) and English (`en`). Both languages share the `Content` type, so a missing translation fails the build. Edit text here, not in components.
-- `src/i18n.tsx`: language provider and `useLang()` hook. The language comes from `?lang=en`, then the visitor's saved choice, then Spanish.
+- `src/content.ts`: all text on the site, in English (`en`, the default) and Spanish (`es`). Both languages share the `Content` type, so a missing translation fails the build. Edit text here, not in components.
+- `src/i18n.tsx`: language provider and `useLang()` hook. The language comes from `?lang=es`, then the visitor's saved choice, then English.
 - `src/components/`: one component per page section. `SkyRun.tsx` is the canvas mini-game.
 - `src/hooks/useKonami.ts`: Konami-code easter egg (CRT mode).
 - `src/styles.css`: global styles. Colors and fonts are CSS tokens in `:root`.

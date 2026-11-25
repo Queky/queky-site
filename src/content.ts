@@ -1,6 +1,6 @@
-export type Lang = "es" | "en";
-export const LANGS: Lang[] = ["es", "en"];
-export const DEFAULT_LANG: Lang = "es";
+export type Lang = "en" | "es";
+export const LANGS: Lang[] = ["en", "es"];
+export const DEFAULT_LANG: Lang = "en";
 
 export const EMAIL = "hello@queky.es";
 export const GITHUB = "https://github.com/queky";

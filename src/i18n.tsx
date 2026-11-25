@@ -9,7 +9,7 @@ const LangContext = createContext<LangState | null>(null);
 
 const isLang = (value: unknown): value is Lang => LANGS.includes(value as Lang);
 
-/** URL (?lang=en) wins, then the visitor's last choice, then Spanish. */
+/** URL (?lang=es) wins, then the visitor's last choice, then English. */
 function initialLang(): Lang {
   const fromUrl = new URLSearchParams(location.search).get("lang");
   if (isLang(fromUrl)) return fromUrl;
