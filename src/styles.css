@@ -68,6 +68,11 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .hud nav a:hover, .hud nav a:focus-visible { color: var(--coin); }
 .hud nav a::before { content: "▸"; color: transparent; margin-right: 4px; }
 .hud nav a:hover::before { color: var(--coin); }
+.hud-actions { display: flex; align-items: center; gap: 10px; }
+.audio-toggle { display: inline-flex; align-items: center; gap: 6px; font: 12px/1 var(--f-display); color: var(--dim); background: var(--panel); border: 0; padding: 8px 10px; cursor: pointer; box-shadow: 0 0 0 2px var(--panel-2); }
+.audio-toggle:hover { color: var(--ink); }
+.audio-toggle[aria-pressed="true"] { background: var(--sky); color: var(--edge); box-shadow: 0 0 0 2px var(--edge); }
+.audio-toggle[aria-pressed="true"] .note { display: inline-block; animation: bob 0.8s steps(2) infinite; }
 .lang-switch { display: flex; gap: 6px; }
 .lang-switch button { font: 12px/1 var(--f-display); color: var(--dim); background: var(--panel); border: 0; padding: 8px 10px; cursor: pointer; box-shadow: 0 0 0 2px var(--panel-2); }
 .lang-switch button:hover { color: var(--ink); }

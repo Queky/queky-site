@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type PointerEvent } from "react";
+import { playSfx } from "../audio";
 import { useLang } from "../i18n";
 
 const DURATION = 45;
@@ -129,6 +130,7 @@ export default function SkyRun() {
         setLeft(remaining);
       }
       if (w.elapsed >= DURATION) {
+        playSfx("land");
         setPhase("landed");
         return;
       }
@@ -152,10 +154,11 @@ export default function SkyRun() {
         o.wobble += dt * 6;
         const oy = o.kind === "bird" ? o.y + Math.sin(o.wobble) * 4 : o.y;
         const hit = o.x < px + 22 && o.x + 14 > px + 2 && oy < py + 14 && oy + 8 > py + 2;
-        if (hit && o.kind === "coin") { w.score++; setScore(w.score); return false; }
+        if (hit && o.kind === "coin") { w.score++; setScore(w.score); playSfx("coin"); return false; }
         if (hit && o.kind === "bird" && w.hurt === 0) {
           w.lives--; w.hurt = 1.2; setLives(w.lives);
-          if (w.lives <= 0) setPhase("crashed");
+          if (w.lives <= 0) { playSfx("crash"); setPhase("crashed"); }
+          else playSfx("hit");
           return false;
         }
         if (o.kind === "coin") sprite(g, COIN, o.x, oy, p.coin);
@@ -186,6 +189,7 @@ export default function SkyRun() {
   const start = () => {
     world.current = { y: H / 2, target: H / 2, things: [], clouds: newClouds(), spawn: 0.5, elapsed: 0, hurt: 0, score: 0, lives: LIVES };
     setScore(0); setLives(LIVES); setLeft(DURATION); setPhase("flying");
+    playSfx("takeoff");
   };
 
   const steer = (e: PointerEvent<HTMLCanvasElement>) => {

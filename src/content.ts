@@ -29,7 +29,7 @@ export type GamePhase = "idle" | "landed" | "crashed" | "aborted";
 export interface Boss { id: string; name: string; when: string; challenge: string; strategy: string; result: string }
 
 export interface Content {
-  nav: { career: string; bosses: string; skills: string; extras: string; game: string; contact: string; languages: string; sections: string };
+  nav: { career: string; bosses: string; skills: string; extras: string; game: string; contact: string; languages: string; sections: string; musicOn: string; musicOff: string; bgmOn: string; bgmOff: string };
   hero: {
     player: string; classLine: string; stats: [label: string, value: string][];
     intro: [title: string, text: string][]; next: string; nextAria: string;
@@ -53,7 +53,7 @@ export interface Content {
 }
 
 const es: Content = {
-  nav: { career: "Carrera", bosses: "Retos", skills: "Habilidades", extras: "Extras", game: "Sky run", contact: "Contacto", languages: "Idioma", sections: "Secciones" },
+  nav: { career: "Carrera", bosses: "Retos", skills: "Habilidades", extras: "Extras", game: "Sky run", contact: "Contacto", languages: "Idioma", sections: "Secciones", musicOn: "Activar música 8 bits", musicOff: "Silenciar música 8 bits", bgmOn: "ON", bgmOff: "OFF" },
   hero: {
     player: "Jugador 1",
     classLine: "Clase: Ingeniero de software · Pagos y Growth",
@@ -208,7 +208,7 @@ const es: Content = {
 };
 
 const en: Content = {
-  nav: { career: "Career", bosses: "Challenges", skills: "Skills", extras: "Extras", game: "Sky run", contact: "Contact", languages: "Language", sections: "Sections" },
+  nav: { career: "Career", bosses: "Challenges", skills: "Skills", extras: "Extras", game: "Sky run", contact: "Contact", languages: "Language", sections: "Sections", musicOn: "Play 8-bit background music", musicOff: "Mute 8-bit background music", bgmOn: "ON", bgmOff: "OFF" },
   hero: {
     player: "Player 1",
     classLine: "Class: Software Engineer · Payments & Growth",
